@@ -1,0 +1,112 @@
+================================================================================
+IW-FusionFM 开源发布操作指南（GitHub + Zenodo DOI）
+================================================================================
+
+本 release/ 目录是一个已经做好匿名处理的完整开源快照，内含独立 git 仓库
+（首次 commit 已完成，提交人为 IW-FusionFM <iw-fusionfm@users.noreply.github.com>）。
+按以下步骤操作即可发布。全程注意：不要泄露学校、导师、真实姓名、个人邮箱。
+
+--------------------------------------------------------------------------------
+第一步：注册匿名 GitHub 账号
+--------------------------------------------------------------------------------
+1. 用一个不含任何个人信息的邮箱注册新 GitHub 账号：
+   - 不要用学校邮箱（含学校域名）、不要用常用个人邮箱；
+   - 可以新注册一个 outlook / proton.me 等邮箱，用户名同样不要含姓名拼音、
+     学号、生日等；
+   - 也可以用 GitHub 提供的匿名转发邮箱（见第三步 git 配置）。
+2. GitHub 用户名建议用中性的项目名，例如 iw-fusionfm。
+3. 注册后进入 Settings -> Profile：
+   - Name 留空或填 IW-FusionFM；
+   - 不填公司、学校、地点、个人主页；
+   - 头像用默认或抽象图案，不要用真人照片。
+4. Settings -> Emails：勾选 "Keep my email addresses private" 和
+   "Block command line pushes that expose my email"。这样 GitHub 会给你
+   一个 <id>+<username>@users.noreply.github.com 的匿名邮箱，本仓库
+   commit 已使用此类邮箱，与该设置兼容。
+
+--------------------------------------------------------------------------------
+第二步：创建远程仓库
+--------------------------------------------------------------------------------
+1. 用匿名账号登录 GitHub，点 New repository：
+   - 仓库名建议：iw-fusionfm；
+   - Public（Zenodo 只对公开仓库发 DOI）；
+   - 不要勾选 "Add a README"、不要选 .gitignore / license 模板
+     （本仓库已自带 README.txt、.gitignore、LICENSE，避免首次 push 冲突）。
+2. 仓库描述、网站等字段保持中性，不写单位信息。
+
+--------------------------------------------------------------------------------
+第三步：推送代码
+--------------------------------------------------------------------------------
+在本机 Git Bash 中执行（假设远程仓库地址为
+https://github.com/iw-fusionfm/iw-fusionfm.git，按实际替换）：
+
+    cd /f/neibojiance/release
+
+    # 确认本仓库的提交身份是匿名的（首次 commit 已配置好，这里再核对一遍）
+    git config user.name        # 应输出 IW-FusionFM
+    git config user.email       # 应输出 iw-fusionfm@users.noreply.github.com
+    # 如需与匿名账号的 noreply 邮箱严格一致，可改为：
+    # git config user.email "<id>+iw-fusionfm@users.noreply.github.com"
+    # 修改后如需改写历史提交身份：
+    # git commit --amend --reset-author --no-edit
+
+    git remote add origin https://github.com/iw-fusionfm/iw-fusionfm.git
+    git push -u origin main
+
+注意：
+  - 推送用 HTTPS + 匿名账号的 Personal Access Token，或用匿名账号配置的
+    SSH key；不要用自己常用账号的凭据。
+  - 全局 git 配置（~/.gitconfig）里的真实姓名/邮箱不会被带进这个仓库的
+    提交记录（仓库级配置优先），但 push 时的 GitHub 认证身份必须是匿名账号。
+
+--------------------------------------------------------------------------------
+第四步：Zenodo 关联并获取 DOI
+--------------------------------------------------------------------------------
+1. 打开 https://zenodo.org ，选择 "Sign up"，直接用匿名 GitHub 账号授权
+   登录（Log in with GitHub），不要绑定 ORCID（ORCID 会暴露真实身份），
+   个人资料页留空。
+2. Zenodo 右上角菜单 -> GitHub（https://zenodo.org/account/settings/github/），
+   找到 iw-fusionfm 仓库，把开关拨到 ON（启用 webhook）。
+3. 回到 GitHub 仓库 -> Releases -> Draft a new release：
+   - Tag 填 v1.0.0，标题如 "IW-FusionFM v1.0.0 (anonymous release)"；
+   - 发布后 Zenodo 会自动抓取这个 release 生成存档。
+4. 回到 Zenodo 的 GitHub 页面，点仓库条目，即可看到分配的 DOI
+   （形如 10.5281/zenodo.XXXXXXX，同时会有 concept DOI 和版本 DOI，
+   引用时建议用 concept DOI，它始终指向最新版本）。
+5. 在 Zenodo 存档页面点 Edit，检查元数据：
+   - Creators 保持 IW-FusionFM Team；
+   - License：注意本仓库代码是 MIT、event_database/ 是 CC-BY-4.0。
+     Zenodo 默认读 GitHub 的 LICENSE（MIT）；可在描述里补一句
+     "The event database under event_database/ is released under CC-BY-4.0"。
+   - 不要填资助号、单位、ORCID。
+
+--------------------------------------------------------------------------------
+第五步：回填 DOI
+--------------------------------------------------------------------------------
+拿到 DOI 后（假设为 10.5281/zenodo.XXXXXXX）：
+
+1. 编辑 release/CITATION.cff：
+   把 "# doi: 10.5281/zenodo.XXXXXXX" 一行的注释去掉并填真实 DOI：
+       doi: 10.5281/zenodo.XXXXXXX
+2. 编辑 release/README.txt：
+   把 Citation 一节里的 "DOI: 10.5281/zenodo.XXXXXXX   (placeholder ...)"
+   替换为真实 DOI，删掉占位说明。
+3. 提交并推送：
+       cd /f/neibojiance/release
+       git add CITATION.cff README.txt
+       git commit -m "Add Zenodo DOI"
+       git push
+4. 如需让 Zenodo 存档也包含 DOI 元数据，可在 GitHub 上再发一个
+   v1.0.1 release，Zenodo 会生成新版本存档（concept DOI 不变）。
+
+--------------------------------------------------------------------------------
+其他注意事项
+--------------------------------------------------------------------------------
+- 评审期间如需更新代码，重复 第五步第 3 点的 commit/push 即可；
+  新功能完成后在 GitHub 发新 release，Zenodo 自动出新版本 DOI。
+- 不要在 GitHub 的 issue、wiki、Pages 里留下任何身份信息。
+- 如果之前用真实账号 clone/push 过该仓库，检查 git log 确认没有真实身份
+  的提交混入；必要时用 git filter-repo 重写历史（本仓库当前只有一条匿名
+  commit，无此问题）。
+- 比赛规定禁止开源的时间窗口内，请先把仓库设为 Private；注意 Zenodo 只对
+  Public 仓库发 DOI，可在允许公开的时点再转 Public 并关联 Zenodo。
