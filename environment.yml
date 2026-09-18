@@ -1,0 +1,27 @@
+name: iw
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - --index-url https://download.pytorch.org/whl/cu128
+      - torch
+      - torchvision
+      - timm
+      - rasterio
+      - xarray
+      - netcdf4
+      - h5netcdf
+      - opencv-python-headless
+      - pyyaml
+      - tqdm
+      - requests
+      - scikit-image
+      - pandas
+      - matplotlib
+      - asf_search
+      - earthaccess
+      - sentinelsat
+# 硬件说明：本机 RTX 5060 Laptop (8 GB, sm_120 Blackwell)。
+# 必须使用 cu128 及以上构建的 PyTorch（>=2.7），cu118 及更早版本不支持 sm_120。

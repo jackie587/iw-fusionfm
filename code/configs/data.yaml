@@ -1,0 +1,36 @@
+# 数据路径与预处理参数（对应《数据输入处理方案_S1与SWOT.txt》）
+
+project_root: .                # TODO: set to your local project root (absolute path recommended)
+
+paths:
+  raw_sentinel1: data/raw/sentinel1
+  raw_swot: data/raw/swot
+  raw_aux: data/raw/auxiliary
+  sar_tiles: data/processed/sar_tiles
+  swot_patches: data/processed/swot_patches
+  l1_dataset: data/datasets/L1_sar_stripe
+  l2_dataset: data/datasets/L2_s1_swot_matched
+  l3_dataset: data/datasets/L3_swot_background
+
+sar:
+  product_type: GRD          # IW 模式 GRD，不用 SLC
+  polarizations: [VV, VH]
+  tile_size: 512
+  tile_stride: 384           # 25% 重叠
+  db_clip: [-30.0, 0.0]      # σ0_dB 裁剪范围，之后归一到 [0,1]
+  incidence_ref_deg: 35.0    # 入射角归一化参考角
+  incidence_bin_deg: 1.0     # 入射角分 bin 宽度
+  speckle_filter: refined_lee
+  speckle_window: 5          # 宁弱勿强：条纹对比度仅 1~2 dB
+
+swot:
+  product: SWOT_L2_LR_SSH_Expert_2.0
+  short_name: SWOT_L2_LR_SSH_EXPERT_2.0
+  resample_res_m: 500        # 重投影栅格分辨率（保持粗分辨率，不拉到 10 m）
+  ssha_strong_event_cm: 3.0  # 弱标签筛选阈值
+
+quality_filter:
+  wind_min_ms: 2.0           # ERA5 10m 风速下限（太低条纹不成像）
+  wind_max_ms: 10.0          # 上限（太高条纹被淹没）
+  match_dt_min: 30           # S1×SWOT 严格配对时间窗（分钟）
+  wave_speed_ms: [0.5, 3.0]  # 传播校正用内波相速度范围

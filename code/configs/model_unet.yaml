@@ -1,0 +1,7 @@
+# U-Net 基线模型（第一期基线）
+
+name: unet
+in_channels: 3        # [VV_dB, VH_dB, 入射角]
+out_channels: 1       # 条纹二值分割
+base_channels: 32     # 8GB 显存适配：标准 64 减半
+depth: 4

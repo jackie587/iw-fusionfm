@@ -1,0 +1,16 @@
+# 门控融合版双分支模型（v2）：Swin 特征生成门控调制 CNN 注入，
+# 动机见 dual_fuse.py GatedFuseBlock（v1 concat 融合被 CNN 虚警污染，far 23.1%）
+
+name: dual_fuse
+fusion: gated                             # concat（v1）| gated（v2）
+in_channels: 3
+out_channels: 1
+base_channels: 32                         # CNN 分支
+backbone: swin_tiny_patch4_window7_224    # Swin 分支
+pretrained: imagenet                      # Swin 分支用本地 ImageNet 权重
+imagenet_weights: checkpoints/imagenet/swin_tiny_patch4_window7_224_timm.pth
+img_size: 512
+use_gradient_checkpointing: true
+# 热启动：从两个已训基线加载编码器（留空字符串则该分支从零开始）
+warm_start_unet: checkpoints/experiments/baseline_unet_v1/best.pth
+warm_start_swin: checkpoints/experiments/swin_unet_v2/best.pth

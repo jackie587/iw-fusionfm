@@ -1,0 +1,39 @@
+# v7 SAM 精标微调（对照 v5：Tao 391 图的监督从框填充掩膜升级为
+# SAM box-prompt 条纹掩膜（欠分割回退框填充），负样本库不变）
+
+experiment_name: swin_unet_v7_sam
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: tao2022_negmix3_sam
+  train_split: 0.8
+  num_workers: 4
+
+model:
+  config: code/configs/model_swin_sam.yaml
+
+train:
+  epochs: 20
+  batch_size: 4
+  grad_accum_steps: 8
+  amp: true
+  lr: 0.00005
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 1
+  oversample_stripe: true
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou, f1, far]
+  stripe_tolerance_px: 3
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

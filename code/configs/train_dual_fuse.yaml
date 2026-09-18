@@ -1,0 +1,38 @@
+# 双分支融合实验配置（对照 baseline_unet_v1 / swin_unet_v2，超参一致）
+
+experiment_name: dual_fuse_v1
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: tao2022
+  train_split: 0.8
+  num_workers: 4
+
+model:
+  config: code/configs/model_dual_fuse.yaml
+
+train:
+  epochs: 50
+  batch_size: 4
+  grad_accum_steps: 8         # 等效 batch 32
+  amp: true
+  lr: 0.0002
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 2
+  oversample_stripe: true
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou, f1, far]
+  stripe_tolerance_px: 3
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

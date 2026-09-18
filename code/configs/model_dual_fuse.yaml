@@ -1,0 +1,14 @@
+# 双分支互补融合模型（CNN 高召回 + Swin 高精度，见 dual_fuse.py 设计动机）
+
+name: dual_fuse
+in_channels: 3
+out_channels: 1
+base_channels: 32                         # CNN 分支
+backbone: swin_tiny_patch4_window7_224    # Swin 分支
+pretrained: imagenet                      # Swin 分支用本地 ImageNet 权重
+imagenet_weights: checkpoints/imagenet/swin_tiny_patch4_window7_224_timm.pth
+img_size: 512
+use_gradient_checkpointing: true
+# 热启动：从两个已训基线加载编码器（留空字符串则该分支从零开始）
+warm_start_unet: checkpoints/experiments/baseline_unet_v1/best.pth
+warm_start_swin: checkpoints/experiments/swin_unet_v2/best.pth

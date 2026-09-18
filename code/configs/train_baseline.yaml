@@ -1,0 +1,38 @@
+# 基线训练配置（8GB 显存适配版）
+
+experiment_name: baseline_unet_v1
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: tao2022            # tao2022 | tiles
+  train_split: 0.8
+  num_workers: 4
+
+model:
+  config: code/configs/model_unet.yaml
+
+train:
+  epochs: 50
+  batch_size: 4               # 8GB 显存
+  grad_accum_steps: 8         # 等效 batch 32
+  amp: true                   # 混合精度
+  lr: 0.0003
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 2
+  oversample_stripe: true     # 每 batch 保证含条纹 patch（文献共识：比调损失收益大）
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}   # β>α 保召回
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou, f1, far]
+  stripe_tolerance_px: 3      # 容差条纹级检出率的定位容差
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

@@ -1,0 +1,13 @@
+# Swin 编码器 + U 型解码 + 多方向 strip pooling（第二阶段主力，第一期冒烟）
+
+name: swin_unet
+in_channels: 3
+out_channels: 1
+backbone: swin_tiny_patch4_window7_224   # timm 模型名
+pretrained: imagenet                      # none | imagenet | ssl4eo（勘误：SSL4EO 无 S1 Swin 权重，见 ssl4eo_loader.py）
+imagenet_weights: checkpoints/imagenet/swin_tiny_patch4_window7_224_timm.pth   # torchvision 官方权重经 convert_tv_swin_to_timm.py 转换
+ssl4eo_weights: checkpoints/ssl4eo/B2_vits16_mae_ep99.pth   # 仅 ViT/ResNet 编码器路线可用
+img_size: 512
+strip_pool: true                          # 多方向条带池化
+use_gradient_checkpointing: true          # 8GB 显存适配
+film_cond_dim: 0                          # >0 时启用 FiLM 条件注入（第三期）

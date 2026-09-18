@@ -1,0 +1,38 @@
+# SAR-only 对照组：与 train_swin_film.yaml 逐字段相同，
+# 仅 swot_zero: true（swot 输入恒零，FiLM 恒等退化）+ 实验名不同
+
+experiment_name: swin_film_l2_v1_saronly
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: l2pair
+  num_workers: 4
+  swot_dropout: 0.25
+  swot_zero: true          # SAR-only 对照：swot 输入恒零
+
+model:
+  config: code/configs/model_swin_film.yaml
+
+train:
+  epochs: 20
+  batch_size: 8
+  grad_accum_steps: 4
+  amp: true
+  lr: 0.00001          # 与 train_swin_film.yaml 保持一致（5e-5 摧毁热启动）
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 1
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou]
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

@@ -1,0 +1,12 @@
+# v8 模型配置：结构同 v2~v7，初始化为 v7 整模型权重热加载
+
+name: swin_unet
+in_channels: 3
+out_channels: 1
+backbone: swin_tiny_patch4_window7_224
+pretrained: none                          # 整模型由 init_ckpt 加载
+img_size: 512
+strip_pool: true
+use_gradient_checkpointing: true
+film_cond_dim: 0
+init_ckpt: checkpoints/final/swin_unet_v7_sam/best.pth

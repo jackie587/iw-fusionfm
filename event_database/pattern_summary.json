@@ -1,0 +1,30 @@
+{
+ "n_high": 207,
+ "split_lon": 109.5,
+ "west_hainan": {
+  "n": 57,
+  "wavelength_median_m": 329.0,
+  "wavelength_p25_p75_m": [
+   250.0,
+   609.0
+  ],
+  "direction_axial_mean_deg": 86.8,
+  "direction_resultant_R": 0.674,
+  "wind_median_ms": 7.66,
+  "n_crest_median": 4.0,
+  "corr_wind_wavelength": 0.102
+ },
+ "east_scs_slope": {
+  "n": 150,
+  "wavelength_median_m": 461.0,
+  "wavelength_p25_p75_m": [
+   266.8,
+   752.5
+  ],
+  "direction_axial_mean_deg": 89.3,
+  "direction_resultant_R": 0.523,
+  "wind_median_ms": 3.52,
+  "n_crest_median": 6.5,
+  "corr_wind_wavelength": -0.121
+ }
+}

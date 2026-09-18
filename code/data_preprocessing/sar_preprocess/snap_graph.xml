@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SNAP GPT 批处理图：Sentinel-1 IW GRD → σ0_dB GeoTIFF
+     链：精密轨道 → 边缘噪声去除 → 热噪声去除 → 辐射定标(σ0) →
+         Refined Lee 5x5（宁弱勿强）→ 地形校正(WGS84, SRTM) → 写 GeoTIFF
+     由 run_snap.py 驱动；dB 转换在读出后做（σ0_dB = 10·log10(σ0)）。 -->
+<graph id="s1_iw_grd_preprocess">
+  <version>1.0</version>
+
+  <node id="read">
+    <operator>Read</operator>
+    <parameters><file>${input}</file></parameters>
+  </node>
+
+  <node id="orbit">
+    <operator>Apply-Orbit-File</operator>
+    <sources><sourceProduct refid="read"/></sources>
+    <parameters>
+      <orbitType>Sentinel Precise (Auto Download)</orbitType>
+      <continueOnFail>true</continueOnFail>
+    </parameters>
+  </node>
+
+  <node id="borderNoise">
+    <operator>Remove-GRD-Border-Noise</operator>
+    <sources><sourceProduct refid="orbit"/></sources>
+  </node>
+
+  <node id="thermalNoise">
+    <operator>ThermalNoiseRemoval</operator>
+    <sources><sourceProduct refid="borderNoise"/></sources>
+    <parameters><removeThermalNoise>true</removeThermalNoise></parameters>
+  </node>
+
+  <node id="calibration">
+    <operator>Calibration</operator>
+    <sources><sourceProduct refid="thermalNoise"/></sources>
+    <parameters>
+      <outputSigmaBand>true</outputSigmaBand>
+      <sourceBands>Sigma0_VV,Sigma0_VH</sourceBands>
+    </parameters>
+  </node>
+
+  <node id="speckle">
+    <operator>Speckle-Filter</operator>
+    <sources><sourceProduct refid="calibration"/></sources>
+    <parameters>
+      <filter>Refined Lee</filter>
+      <filterSizeX>5</filterSizeX>
+      <filterSizeY>5</filterSizeY>
+    </parameters>
+  </node>
+
+  <node id="terrain">
+    <operator>Terrain-Correction</operator>
+    <sources><sourceProduct refid="speckle"/></sources>
+    <parameters>
+      <demName>SRTM 1Sec HGT</demName>
+      <mapProjection>EPSG:4326</mapProjection>
+      <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
+      <nodataValueAtSea>false</nodataValueAtSea>
+      <saveSelectedSourceBand>true</saveSelectedSourceBand>
+    </parameters>
+  </node>
+
+  <node id="write">
+    <operator>Write</operator>
+    <sources><sourceProduct refid="terrain"/></sources>
+    <parameters>
+      <file>${output}</file>
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+</graph>

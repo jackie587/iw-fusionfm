@@ -1,0 +1,16 @@
+# SWOT FiLM 弱融合模型：SwinUNet 主干（结构同 v7）+ SWOT 小 CNN 条件编码
+# + bottleneck FiLM 调制；init_ckpt 热加载 v7 权重（按形状匹配部分加载）
+
+name: swin_film
+in_channels: 3
+out_channels: 1
+backbone: swin_tiny_patch4_window7_224
+pretrained: none                          # 主干由 init_ckpt 加载
+img_size: 512
+strip_pool: true
+use_gradient_checkpointing: true
+freeze_bn: true                           # 微调冻结主干 BN 统计量（防域差漂移）
+freeze_encoder: true                      # 冻结编码器+条带池化（热启动盆地过尖）
+cond_dim: 128                             # SWOT 条件向量维度
+swot_channels: 3                          # [ssha×100, |grad|×1e5, mask]
+init_ckpt: checkpoints/final/swin_unet_v7_sam/best.pth

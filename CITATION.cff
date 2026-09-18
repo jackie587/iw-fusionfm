@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+title: "IW-FusionFM: Ocean Internal Wave Detection from Sentinel-1 SAR and SWOT"
+message: >-
+  If you use this software or the accompanying event database,
+  please cite it using the metadata in this file.
+type: software
+authors:
+  - name: "IW-FusionFM Team (anonymous, for double-blind review)"
+# DOI placeholder: after archiving this repository on Zenodo,
+# replace the line below with the assigned DOI, e.g.
+# doi: 10.5281/zenodo.1234567
+# doi: 10.5281/zenodo.XXXXXXX
+url: "https://github.com/iw-fusionfm/iw-fusionfm"
+license: MIT
+abstract: >-
+  IW-FusionFM is a research pipeline for detecting oceanic internal
+  solitary waves in Sentinel-1 IW GRD SAR imagery with SWOT KaRIn
+  sea-surface height as an auxiliary modality. It combines Swin-UNet
+  segmentation with FiLM-based SWOT fusion, a two-stage context-verifier
+  cascade, wind-visibility correction, KdV/eKdV amplitude inversion, and
+  a curated database of 2315 verified internal wave events in the
+  northern South China Sea (July-October 2023).
+keywords:
+  - ocean internal waves
+  - synthetic aperture radar
+  - Sentinel-1
+  - SWOT
+  - deep learning
+  - semantic segmentation
+  - KdV inversion
+  - South China Sea
+version: 1.0.0
+date-released: 2026-09-07

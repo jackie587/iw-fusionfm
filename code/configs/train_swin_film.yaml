@@ -1,0 +1,40 @@
+# SWOT FiLM 弱融合实验 v1：L2 配对块，按天划分（20230830 验证）
+# 对照组 swin_film_l2_v1_saronly 仅多 data.swot_zero: true（见同目录
+# train_swin_film_saronly.yaml），其余逐字段相同
+
+experiment_name: swin_film_l2_v1
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: l2pair
+  num_workers: 4
+  swot_dropout: 0.25       # 训练时随机清零 swot，模拟缺失模态
+  swot_zero: false         # true = SAR-only 对照
+
+model:
+  config: code/configs/model_swin_film.yaml
+
+train:
+  epochs: 20
+  batch_size: 8
+  grad_accum_steps: 4
+  amp: true
+  lr: 0.00001          # 实测 5e-5 一个 epoch 即摧毁 v7 热启动（val dice
+                       # 0.80→0.24，pred_frac 5×label_frac），降为 1e-5
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 1
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou]
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

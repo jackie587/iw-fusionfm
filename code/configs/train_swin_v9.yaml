@@ -1,0 +1,41 @@
+# v9 多季节全量重训：tao2022_negmix6_sam（rounds1-6 全量负样本，
+# 冬季 3 景留出不进训练）+ 域对齐增强，热加载 v7。
+# 与 v7 差异仅三处：数据集 negmix3_sam→negmix6_sam、domain_aug 开启、
+# 初始化 v5→v7。验证集（Tao 78 图）与 v2~v8 严格一致，可横向对比。
+
+experiment_name: swin_unet_v9_negmix6
+seed: 42
+
+data:
+  config: code/configs/data.yaml
+  dataset: tao2022_negmix6_sam
+  train_split: 0.8
+  num_workers: 4
+  domain_aug: true
+
+model:
+  config: code/configs/model_swin_sam_v9.yaml
+
+train:
+  epochs: 20
+  batch_size: 2          # 8GB 显存被桌面显示挤占后会顶爆，bs4→2 保险（等效 batch 不变）
+  grad_accum_steps: 16
+  amp: true
+  lr: 0.00005
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_epochs: 1
+
+loss:
+  focal_tversky: {alpha: 0.3, beta: 0.7, gamma: 1.333, weight: 1.0}
+  cldice: {weight: 0.5, iters: 10}
+  mcc: {weight: 0.5}
+
+eval:
+  metrics: [dice, iou, f1, far]
+  stripe_tolerance_px: 3
+
+logging:
+  log_dir: logs
+  ckpt_dir: checkpoints/experiments
+  save_every_epoch: 5

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Secrets — never commit credentials
+.secrets/
+*.netrc
+
+# Data and large artifacts (reproduce with the download/preprocess scripts)
+data/raw/
+!code/data/raw/README_DATA.txt
+data/processed/
+data/datasets/
+*.SAFE/
+*.zip
+*.nc
+*.nc4
+*.h5
+*.tif
+*.tiff
+*.npy
+*.npz
+
+# Model checkpoints
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.onnx
+
+# Logs and results
+logs/
+*.log
+results/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp

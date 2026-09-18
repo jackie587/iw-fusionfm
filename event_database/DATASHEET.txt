@@ -1,0 +1,183 @@
+================================================================================
+DATASHEET — IW-FusionFM Internal Solitary Wave Event Database
+================================================================================
+Anonymous release by the IW-FusionFM Team (prepared for double-blind review).
+License: Creative Commons Attribution 4.0 International (CC-BY-4.0).
+Please credit "IW-FusionFM Team" and cite the repository DOI when using
+this database (see README.txt / CITATION.cff).
+
+--------------------------------------------------------------------------------
+1. Overview
+--------------------------------------------------------------------------------
+This database contains oceanic internal solitary wave (ISW) events detected
+in Sentinel-1 IW GRD SAR imagery over the northern South China Sea. Events
+were produced by a two-stage machine-learning detection pipeline (SAR stripe
+segmentation followed by a context-verifier cascade), then quality-flagged
+through manual visual interpretation. Each event carries geometry (crest
+count, crest length, propagation direction, wavelength), collocated ERA5
+10 m wind, a quality tier, and the review outcome.
+
+Files in this directory:
+
+    events_verified.csv     2816 candidate events that went through the
+                            verification/review process; keep_verified=True
+                            marks the 2315 verified events
+    events.csv              same candidate events, geometry and wind only
+                            (no review columns)
+    inversion_results.csv   KdV/eKdV amplitude and phase-speed inversion
+                            results for 181 high-quality events
+    pattern_summary.json    regional pattern statistics (west of Hainan vs.
+                            northern SCS slope, split at lon 109.5 E)
+
+--------------------------------------------------------------------------------
+2. Data sources
+--------------------------------------------------------------------------------
+  - SAR imagery: Sentinel-1A/B Interferometric Wide-swath (IW) Ground Range
+    Detected (GRD) products, VV+VH polarization, obtained from the
+    Copernicus Data Space Ecosystem (https://dataspace.copernicus.eu).
+    Scene identifiers are preserved in the "scene" column.
+  - Wind: ERA5 hourly 10 m wind ( Copernicus Climate Data Store ),
+    collocated to each scene's acquisition time and AOI-mean value.
+  - Auxiliary modality (used during model development, not stored per
+    event): SWOT L2 KaRIn SSH Expert 2.0 (NASA PO.DAAC).
+  - Bathymetry for inversion: SRTM15+.
+  - Stratification for inversion: literature-based seasonal climatological
+    envelope (no in-situ temperature/salinity profiles were used).
+
+--------------------------------------------------------------------------------
+3. Spatial and temporal coverage
+--------------------------------------------------------------------------------
+  - Area of interest: northern South China Sea,
+    approximately lon 106-117 E, lat 16.8-22.6 N.
+  - Time range: mainly July-October 2023
+    (verified events span 2023-07-01 to 2023-10-10 UTC; a small number of
+    June 2023 candidates appear in the full candidate table).
+  - Sentinel-1 acquisitions over this AOI are around 10:25/10:50 and
+    22:5x UTC (descending/ascending passes).
+
+--------------------------------------------------------------------------------
+4. Size and composition
+--------------------------------------------------------------------------------
+  - 2816 reviewed candidate events in events_verified.csv.
+  - 2315 verified events (keep_verified=True):
+        high   quality:  389
+        medium quality:  530
+        low    quality: 1396
+  - 501 rejected candidates (keep_verified=False), with drop_reason:
+        nearshore     408   too close to the coast / shallow-water artifacts
+        blob_invalid   73   blob-like connected component, no wave geometry
+        scene_fp       20   scene-level false positive
+  - 181 events with KdV/eKdV inversion results (inversion_results.csv),
+    all depression polarity, seasons summer (172) and autumn (9).
+
+--------------------------------------------------------------------------------
+5. Labeling and verification process
+--------------------------------------------------------------------------------
+The database was built in four stages:
+
+  1. Model proposals: a Swin-UNet segmentation model detects ISW
+     bright/dark stripe patterns in georeferenced Sentinel-1 tiles; scene
+     probability mosaics are assembled by overlapping-tile inference.
+  2. Crest extraction and event clustering: probability maps (>0.5) are
+     skeletonized into crest lines; crests are clustered into wave-packet
+     events; geometry (direction, wavelength, length) is computed from the
+     crest-line fits with full georeferencing.
+  3. Verifier cascade: candidate patches are re-scored by a context
+     verifier (center crop + wide context) trained to separate true ISW
+     signatures from false alarms (rain cells, wind streaks, speckle,
+     land/coastal artifacts), with scene-level leakage-safe splits.
+  4. Manual interpretation: QA sheets of candidate events were visually
+     reviewed by human interpreters; the keep_verified flag and
+     drop_reason column record the outcome. Quality tiers reflect crest
+     clarity and confidence (high = clear multi-crest packet; low = faint
+     or fragmentary signature).
+
+Wind quality control: ERA5 10 m wind is attached to every event; the
+wind_flag column marks whether the wind falls inside the 2-10 m/s imaging
+window (in_window / low / high). Events outside the window are retained
+but flagged, because SAR ISW visibility degrades outside this range.
+
+--------------------------------------------------------------------------------
+6. Field dictionary — events_verified.csv
+--------------------------------------------------------------------------------
+    event_id          unique event identifier
+                      (<scene-prefix>_E###, per source scene)
+    scene             Sentinel-1 scene name (e.g.
+                      S1A_IW_GRDH_1SDV_20230604T102558_...)
+    time_utc          scene acquisition start time, UTC, ISO 8601
+    lon, lat          event centroid, WGS84 degrees
+    n_crest           number of extracted crest lines in the packet
+    crest_length_km   summed crest length, km
+    direction_deg     propagation direction, geographic azimuth in degrees
+                      (direction the packet travels toward)
+    wavelength_m      median spacing between adjacent crests, m (empty for
+                      single-crest events)
+    mean_prob         mean segmentation probability over the event region
+    wind_ms           collocated ERA5 10 m wind speed, m/s
+    wind_flag         in_window (2-10 m/s) / low (<2) / high (>10)
+    bbox_lon          "lon_min,lon_max" of the event bounding box
+    bbox_lat          "lat_min,lat_max" of the event bounding box
+    area_km2          area of the event region, km^2
+    quality           high / medium / low (see section 5)
+    dist_coast_km     distance from the event centroid to the coastline, km
+    keep_verified     True = verified ISW event; False = rejected
+    drop_reason       rejection reason when keep_verified=False
+                      (nearshore / blob_invalid / scene_fp)
+
+events.csv contains the same events without the review columns
+(keep_verified, drop_reason, dist_coast_km).
+
+--------------------------------------------------------------------------------
+7. Field dictionary — inversion_results.csv (selected fields)
+--------------------------------------------------------------------------------
+    event_id, scene, time_utc, lon, lat, direction_deg, wavelength_m,
+    quality           as above
+    depth_m           SRTM15+ water depth at the event location, m
+    season            seasonal stratification scenario used
+    polarity          wave polarity (all depression in this release)
+    regime            kdv_ok / short_wave / djl_needed validity regime
+    n_scen            number of stratification scenarios combined
+    ekdv_valid        number of scenarios with a valid eKdV root
+    c0_ms_med         median linear long-wave speed, m/s
+    eta0_kdv_m_med / _lo / _hi    KdV amplitude (m): median and range
+    c_kdv_ms_med / _lo / _hi      KdV phase speed (m/s): median and range
+    eta0_ekdv_m_med / _lo / _hi   eKdV amplitude (m): median and range
+    c_ekdv_ms_med     eKdV phase speed (m/s), median
+
+Inversion assumptions (important):
+  - wavelength_m is converted to soliton half-width via l = wavelength/kappa
+    with kappa = pi; amplitude estimates are sensitive to this convention.
+  - Stratification is a climatological envelope sampled as a 3x3
+    sensitivity grid; reported lo/hi are ranges across scenarios, i.e.
+    sensitivity intervals, not measurement truth.
+  - Events flagged djl_needed exceed the KdV/eKdV validity domain; numbers
+    are given for reference only.
+
+--------------------------------------------------------------------------------
+8. Known limitations
+--------------------------------------------------------------------------------
+  - Seasonal coverage bias: the database mainly covers July-October 2023.
+    Winter recall is NOT measurable with the current scene census, so
+    wintertime occurrence statistics cannot be derived from this release.
+  - Low-quality events (1396 of 2315) are faint or fragmentary detections;
+    use them with caution, and prefer high/medium tiers for quantitative
+    analysis.
+  - Detection visibility depends on wind: SAR ISW signatures are only
+    imaged within a soft ~2-10 m/s wind window. Raw event counts are
+    therefore NOT occurrence rates; see the visibility-correction code
+    (code/evaluation/visibility_correction.py) for the correction method.
+  - Wavelength is empty for single-crest events.
+  - Direction is reported as a geographic azimuth derived from crest-line
+    fitting; for near-axial packets the ambiguity is resolved by regional
+    propagation priors, which may occasionally be wrong.
+  - Inversion amplitudes are model-based sensitivity intervals (KdV/eKdV
+    with climatological stratification), not in-situ measurements.
+
+--------------------------------------------------------------------------------
+9. Ethics, privacy and distribution
+--------------------------------------------------------------------------------
+  - The database contains no personal or human-subject data.
+  - Sentinel-1 data are free and open under the Copernicus data policy;
+    ERA5 is distributed under the Copernicus license; users redistributing
+    derived products should comply with the respective source licenses.
+  - This derivative database itself is released under CC-BY-4.0.

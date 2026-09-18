@@ -1,0 +1,13 @@
+# 负样本微调实验的模型配置：结构与 swin_unet v2 完全一致，
+# 初始化改为整模型加载 v2 权重（init_ckpt），不再用 ImageNet 初始化
+
+name: swin_unet
+in_channels: 3
+out_channels: 1
+backbone: swin_tiny_patch4_window7_224
+pretrained: none                          # 整模型由 init_ckpt 加载
+img_size: 512
+strip_pool: true
+use_gradient_checkpointing: true
+film_cond_dim: 0
+init_ckpt: checkpoints/experiments/swin_unet_v2/best.pth
