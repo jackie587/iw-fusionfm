@@ -40,7 +40,7 @@ IW-FusionFM 开源发布操作指南（GitHub + Zenodo DOI）
 在本机 Git Bash 中执行（假设远程仓库地址为
 https://github.com/iw-fusionfm/iw-fusionfm.git，按实际替换）：
 
-    cd /f/neibojiance/release
+    cd <本机 release 目录路径>   # 即本文件所在的目录
 
     # 确认本仓库的提交身份是匿名的（首次 commit 已配置好，这里再核对一遍）
     git config user.name        # 应输出 IW-FusionFM
@@ -92,7 +92,7 @@ https://github.com/iw-fusionfm/iw-fusionfm.git，按实际替换）：
    把 Citation 一节里的 "DOI: 10.5281/zenodo.XXXXXXX   (placeholder ...)"
    替换为真实 DOI，删掉占位说明。
 3. 提交并推送：
-       cd /f/neibojiance/release
+       cd <本机 release 目录路径>   # 即本文件所在的目录
        git add CITATION.cff README.txt
        git commit -m "Add Zenodo DOI"
        git push
