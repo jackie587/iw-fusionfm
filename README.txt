@@ -188,9 +188,9 @@ Citation
 If you use this code or the event database, please cite:
 
     IW-FusionFM Team. IW-FusionFM: Ocean Internal Wave Detection from
-    Sentinel-1 SAR and SWOT. Zenodo.
-    DOI: 10.5281/zenodo.XXXXXXX   (placeholder - to be filled in after
-                                   the Zenodo DOI is assigned)
+    Sentinel-1 SAR and SWOT (v1.0.0). Mendeley Data.
+    DOI: 10.17632/jfxrd9sn93
+    Code: https://github.com/jackie587/iw-fusionfm
 
 Machine-readable citation metadata is in CITATION.cff.
 

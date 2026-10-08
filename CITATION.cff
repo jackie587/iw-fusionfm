@@ -6,11 +6,8 @@ message: >-
 type: software
 authors:
   - name: "IW-FusionFM Team (anonymous, for double-blind review)"
-# DOI placeholder: after archiving this repository on Zenodo,
-# replace the line below with the assigned DOI, e.g.
-# doi: 10.5281/zenodo.1234567
-# doi: 10.5281/zenodo.XXXXXXX
-url: "https://github.com/iw-fusionfm/iw-fusionfm"
+doi: 10.17632/jfxrd9sn93
+url: "https://github.com/jackie587/iw-fusionfm"
 license: MIT
 abstract: >-
   IW-FusionFM is a research pipeline for detecting oceanic internal

@@ -110,3 +110,11 @@ https://github.com/iw-fusionfm/iw-fusionfm.git，按实际替换）：
   commit，无此问题）。
 - 比赛规定禁止开源的时间窗口内，请先把仓库设为 Private；注意 Zenodo 只对
   Public 仓库发 DOI，可在允许公开的时点再转 Public 并关联 Zenodo。
+
+--------------------------------------------------------------------------------
+执行记录（2026-10-08）
+--------------------------------------------------------------------------------
+- 仓库已推送至 https://github.com/jackie587/iw-fusionfm （匿名账号 jackie587）。
+- zenodo.org 在提交网络环境下不可达，DOI 改由 Mendeley Data 分配：
+  10.17632/jfxrd9sn93 （v1, 2026-10-08 发布，数据集为仓库 zip 镜像）。
+- CITATION.cff 与 README.txt 已回填该 DOI。
